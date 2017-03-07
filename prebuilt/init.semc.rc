@@ -62,9 +62,9 @@ on boot
     setprop ro.ril.def.agps.mode 2
 
     # performance tweaks for flash
-    write /sys/block/mtdblock1/bdi/read_ahead_kb 4
-    write /sys/block/mtdblock2/bdi/read_ahead_kb 4
-    write /sys/block/mtdblock3/bdi/read_ahead_kb 4
+    write /sys/block/mtdblock1/bdi/read_ahead_kb 0
+    write /sys/block/mtdblock2/bdi/read_ahead_kb 0
+    write /sys/block/mtdblock3/bdi/read_ahead_kb 0
 
     # LM35xx/cameralight
     chown system system /sys/devices/i2c-0/0-0053/torch_enable
@@ -101,45 +101,36 @@ on boot
     setprop net.tcp.buffersize.hspa 5840,87380,165467,4096,16384,110208
 
 on property:init.svc.bluetoothd=running
-    write /sys/devices/virtual/bluetooth/hci0/link_supervision_timeout 6400
+    write /sys/devices/virtual/bluetooth/hci0/link_supervision_timeout 0
 
 service wlan_loader /system/bin/wlan_loader -i /etc/wifi/tiwlan.ini -f /etc/wifi/tiwlan_firmware.bin -e /data/etc/wifi/fw
-    disabled
     oneshot
 
 service wpa_supplicant /system/bin/wpa_supplicant -Dtiwlan0 -itiwlan0 -c/data/misc/wifi/wpa_supplicant.conf
     socket wpa_tiwlan0 dgram 660 wifi wifi
-    disabled
     oneshot
 
 service dhcpcd_tiwlan0 /system/bin/dhcpcd -ABKL tiwlan0
-    disabled
     oneshot
 
 service iprenew_tiwlan0 /system/bin/dhcpcd -n tiwlan0
-    disabled
     oneshot
 
 service ifcfg_up /system/bin/ifconfig tiwlan0 up
-    disabled
     oneshot
 
 service hciattach /system/bin/hciattach -n /dev/ttyHS0 texas 3000000
     user bluetooth
     group qcom_oncrpc bluetooth net_bt_admin
-    disabled
     oneshot
 
 service wlan_ap_loader /system/bin/tiap_loader.sh
-    disabled
     oneshot
 
 service hostapd /system/bin/hostap /data/misc/wifi/hostapd.conf
-    disabled
     oneshot
 
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0 &
-    disabled
     oneshot
 
 service qmuxd /system/bin/qmuxd
